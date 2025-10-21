@@ -13,6 +13,8 @@ add_executable(llog
         server/log.hpp
         server/poller.cpp
         server/poller.hpp
+        server/ux_connection.hpp
+        server/ux_connection.cpp
 
         client/log.cpp
         client/log.h

@@ -2,6 +2,7 @@
 #include <memory>
 #include "log.hpp"
 #include "descriptor.hpp"
+#include "ux_connection.hpp"
 
 namespace llog {
 
@@ -15,8 +16,8 @@ namespace llog {
             UxServer& operator=(UxServer&&) = delete;
 
             static UxServerPtr create(LogPtr logger, const std::string& sock_path);
-
             [[nodiscard]] int fd() const override;
+            UxConnectionPtr accept() const;
 
             void set_logger(LogPtr logger);
 

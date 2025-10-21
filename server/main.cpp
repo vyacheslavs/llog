@@ -1,5 +1,6 @@
 
 #include <iostream>
+#include <list>
 #include <memory>
 
 #include "utils.h"
@@ -29,11 +30,26 @@ int main(int argc, char **argv) {
 
     poller->add(server, llog::Poller::PollType::READ);
 
+    std::list<llog::UxConnectionPtr> clients;
+
     while (true) {
-        poller->poll(std::chrono::milliseconds(1000));
+        if (!poller->poll(std::chrono::milliseconds(1000)))
+            break;
 
         if (poller->has_events(server)) {
             logger->log(llog::severity::INFO, "server has events");
+
+            auto new_conn = server->accept();
+            if (new_conn) {
+                poller->add(new_conn, llog::Poller::PollType::READ);
+                clients.push_back(std::move(new_conn));
+            }
+        }
+
+        for (auto &client : clients) {
+            if (poller->has_events(client)) {
+                logger->log(llog::severity::INFO, "client has events");
+            }
         }
     }
 

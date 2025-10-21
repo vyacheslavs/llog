@@ -39,6 +39,21 @@ int llog::UxServer::fd() const {
     return m_fd;
 }
 
+llog::UxConnectionPtr llog::UxServer::accept() const {
+    struct sockaddr_un addr;
+    socklen_t addrlen = sizeof(addr);
+
+    auto new_fd = ::accept(m_fd, (struct sockaddr *)&addr, &addrlen);
+    if (new_fd < 0) {
+        return {};
+    }
+
+    llog::UxConnectionPtr conn(new UxConnection);
+    conn->m_fd = new_fd;
+
+    return std::move(conn);
+}
+
 void llog::UxServer::set_logger(LogPtr logger) {
     m_logger = std::move(logger);
 }
