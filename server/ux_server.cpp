@@ -5,8 +5,8 @@
 #include <sys/socket.h>
 #include <sys/un.h>
 
-llog::UxServerUPtr llog::UxServer::create(LogPtr logger, const std::string& sock_path) {
-    UxServerUPtr server(new UxServer);
+llog::UxServerPtr llog::UxServer::create(LogPtr logger, const std::string& sock_path) {
+    UxServerPtr server(new UxServer);
     server->m_logger = std::move(logger);
 
     if ((server->m_fd = socket(AF_UNIX, SOCK_STREAM, 0)) < 0) {

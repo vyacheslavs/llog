@@ -1,26 +1,26 @@
 #pragma once
 #include <memory>
 #include "log.hpp"
+#include "descriptor.hpp"
 
 namespace llog {
 
     using UxServerPtr = std::shared_ptr<class UxServer>;
-    using UxServerUPtr = std::unique_ptr<class UxServer>;
 
-    class UxServer {
+    class UxServer : public DescriptorUsable {
         public:
             UxServer(const UxServer&) = delete;
             UxServer& operator=(const UxServer&) = delete;
             UxServer(UxServer&&) = delete;
             UxServer& operator=(UxServer&&) = delete;
 
-            static UxServerUPtr create(LogPtr logger, const std::string& sock_path);
+            static UxServerPtr create(LogPtr logger, const std::string& sock_path);
 
-            [[nodiscard]] int fd() const;
+            [[nodiscard]] int fd() const override;
 
             void set_logger(LogPtr logger);
 
-            ~UxServer();
+            ~UxServer() override;
         private:
             UxServer() = default;
 
