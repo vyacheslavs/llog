@@ -14,7 +14,7 @@ namespace llog {
 
     class Log {
         public:
-            virtual void log(severity, const std::string& message);
+            virtual bool log(severity, const std::string& message);
             virtual ~Log() = default;
     };
 

@@ -5,8 +5,29 @@
 #include <sys/un.h>
 #include <cstring>
 
-void llog::client::Log::log(llog::severity s, const std::string &message) {
+namespace {
+    constexpr auto header_message_type_len = 2;
+    constexpr auto header_message_len_len = 2;
 
+    constexpr auto LOG_MSG_TYPE_CLIENT_CONNECT = 1;
+}
+
+bool llog::client::Log::log(llog::severity s, const std::string &message) {
+
+    if (!m_client_introduced) {
+        m_client_introduced = true;
+        const auto introduction_pkg_len = m_id.size() + header_message_type_len + header_message_len_len;
+        if (m_client_buffer.size() < introduction_pkg_len) m_client_buffer.resize(introduction_pkg_len);
+        auto *pkg = reinterpret_cast<introduction_pkg*>(m_client_buffer.data());
+        pkg->type = LOG_MSG_TYPE_CLIENT_CONNECT;
+        pkg->len = introduction_pkg_len;
+        std::memcpy(&pkg->id, m_id.data(), m_id.size());
+        if (write(m_fd, m_client_buffer.data(), introduction_pkg_len) != introduction_pkg_len) {
+            return false;
+        }
+    }
+
+    return true;
 }
 
 llog::LogPtr llog::client::Log::create(const std::string &sock_path, const std::string &id) {
@@ -40,6 +61,7 @@ llog::LogPtr llog::client::Log::create(const std::string &sock_path, const std::
 
     LogPtr log(new Log);
     log->m_fd = fd;
+    log->m_id = id;
 
     return log;
 }
