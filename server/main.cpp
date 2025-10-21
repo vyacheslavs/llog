@@ -12,7 +12,7 @@ int main(int argc, char **argv) {
         session_path = create_session_path(argv[1]);
     }
     auto logger = std::make_shared<llog::Log>();
-    logger->log("starting the llog daemon with session path: " + session_path);
+    logger->log(llog::severity::INFO,"starting the llog daemon with session path: " + session_path);
     auto server = llog::UxServer::create(logger, session_path);
 
     if (!server)

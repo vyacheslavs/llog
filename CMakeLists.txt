@@ -11,5 +11,9 @@ add_executable(llog
         server/ux_server.hpp
         server/log.cpp
         server/log.hpp
+
+        client/log.cpp
+        client/log.h
 )
 
+target_include_directories(llog PRIVATE ${PROJECT_SOURCE_DIR})

@@ -10,7 +10,7 @@ llog::UxServerUPtr llog::UxServer::create(LogPtr logger, const std::string& sock
     server->m_logger = std::move(logger);
 
     if ((server->m_fd = socket(AF_UNIX, SOCK_STREAM, 0)) < 0) {
-        server->m_logger->log("failed to create socket");
+        server->m_logger->log(severity::ERROR, "failed to create socket");
         return {};
     }
 
@@ -23,12 +23,12 @@ llog::UxServerUPtr llog::UxServer::create(LogPtr logger, const std::string& sock
     strncpy(addr.sun_path, sock_path.c_str(), sizeof(addr.sun_path)-1);
 
     if (bind(server->m_fd, (struct sockaddr*)&addr, sizeof(addr)) < 0) {
-        server->m_logger->log("failed to bind socket");
+        server->m_logger->log(severity::ERROR, "failed to bind socket");
         return {};
     }
 
     if (listen(server->m_fd, 5) < 0) {
-        server->m_logger->log("failed to listen on socket");
+        server->m_logger->log(severity::ERROR, "failed to listen on socket");
         return {};
     }
 
