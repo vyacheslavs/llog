@@ -1,6 +1,7 @@
 #pragma once
 
 #include "descriptor.hpp"
+#include "message.hpp"
 #include <memory>
 
 namespace llog {
@@ -13,10 +14,14 @@ namespace llog {
             [[nodiscard]] int fd() const override;
             ~UxConnection() override;
 
+            [[nodiscard]] bool alive() const;
+            MessagePtr read();
+
     private:
             UxConnection() = default;
             friend class UxServer;
 
+            bool m_alive {true};
             int m_fd {-1};
     };
 

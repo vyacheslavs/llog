@@ -37,18 +37,26 @@ int main(int argc, char **argv) {
             break;
 
         if (poller->has_events(server)) {
-            logger->log(llog::severity::INFO, "server has events");
+            logger->log(llog::severity::INFO, "server has a new connection");
 
-            auto new_conn = server->accept();
-            if (new_conn) {
+            if (auto new_conn = server->accept()) {
                 poller->add(new_conn, llog::Poller::PollType::READ);
                 clients.push_back(std::move(new_conn));
-            }
+            } else
+                break;
         }
 
-        for (auto &client : clients) {
+        for (auto client_it = clients.begin(); client_it != clients.end(); ++client_it) {
+            auto client = *client_it;
             if (poller->has_events(client)) {
                 logger->log(llog::severity::INFO, "client has events");
+
+                if (auto msg = client->read()) {
+
+                } else if (!client->alive()) {
+                    poller->remove(client);
+                    client_it = clients.erase(client_it);
+                }
             }
         }
     }

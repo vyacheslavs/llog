@@ -11,3 +11,11 @@ llog::UxConnection::~UxConnection() {
         close(m_fd);
     }
 }
+
+bool llog::UxConnection::alive() const {
+    return true;
+}
+
+llog::MessagePtr llog::UxConnection::read() {
+    return {};
+}

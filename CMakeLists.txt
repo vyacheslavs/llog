@@ -20,4 +20,10 @@ add_executable(llog
         client/log.h
 )
 
+add_executable(rl
+        tests/rl.cpp
+)
+
+target_link_libraries(rl PRIVATE readline)
+
 target_include_directories(llog PRIVATE ${PROJECT_SOURCE_DIR})
