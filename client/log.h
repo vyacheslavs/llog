@@ -20,8 +20,12 @@ namespace llog::client {
         public:
             void log(llog::severity s, const std::string &message) override;
             static LogPtr create(const std::string& sock_path, const std::string& id);
+
+            ~Log();
         private:
             Log() = default;
+
+            int m_fd {-1};
     };
 
     using LogPtr = std::shared_ptr<class Log>;

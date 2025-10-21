@@ -39,6 +39,10 @@ int llog::UxServer::fd() const {
     return m_fd;
 }
 
+void llog::UxServer::set_logger(LogPtr logger) {
+    m_logger = std::move(logger);
+}
+
 llog::UxServer::~UxServer() {
     if (m_fd >= 0) {
         close(m_fd);

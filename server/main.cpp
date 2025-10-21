@@ -4,6 +4,7 @@
 
 #include "utils.h"
 #include "ux_server.hpp"
+#include "client/log.h"
 
 int main(int argc, char **argv) {
 
@@ -17,6 +18,11 @@ int main(int argc, char **argv) {
 
     if (!server)
         return 1;
+
+    auto client_log = llog::client::Log::create(session_path, "internal_logger");
+    server->set_logger(client_log);
+
+
 
     return 0;
 }

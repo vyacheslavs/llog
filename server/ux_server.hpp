@@ -18,6 +18,8 @@ namespace llog {
 
             [[nodiscard]] int fd() const;
 
+            void set_logger(LogPtr logger);
+
             ~UxServer();
         private:
             UxServer() = default;
