@@ -1,6 +1,5 @@
 #pragma once
 
-#include <cstdint>
 #include <vector>
 #include <list>
 #include "log.hpp"
@@ -26,6 +25,7 @@ namespace llog {
             DQueue() = default;
 
             void reset();
+            void set_logger(LogPtr logger);
 
         private:
 
@@ -33,6 +33,7 @@ namespace llog {
             std::list<vector_type> m_vector_pool;
             std::list<vector_type> m_vectors;
             size_t m_size{0};
+            LogPtr m_logger;
     };
 
 }

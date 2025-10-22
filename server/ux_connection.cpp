@@ -48,7 +48,7 @@ void llog::UxConnection::read(HandlerChainLinkPtr h) {
                     m_proto_state = proto_state::READ_MSG_TYPE_DONE;
                 } else {
                     // not acceptable, close the connection
-                    m_log->log(severity::WARNING, "Connection closed due to invalid message type");
+                    m_log->log(severity::WARNING, "Connection closed due to invalid message type : " + std::to_string(*_ptr));
                     process_chain(h, ServerConnectionDeadMessage::create(m_fd));
                     return;
                 }

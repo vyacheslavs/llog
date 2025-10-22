@@ -76,7 +76,8 @@ int main(int argc, char **argv) {
 
         for (auto& [client_fd, client] : *poller) {
             if (auto ux_connection = dynamic_cast<llog::UxConnection*>(client.descriptor.get())) {
-                ux_connection->read(server_handler_chain);
+                if (poller->has_events(client.descriptor))
+                    ux_connection->read(server_handler_chain);
             }
         }
     }

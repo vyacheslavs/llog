@@ -20,8 +20,7 @@ std::pair<uint8_t *, size_t> llog::DQueue::allocate(size_t size) {
 }
 
 void llog::DQueue::commit(size_t size) {
-
-    auto back = m_vectors.back();
+    auto& back = m_vectors.back();
     back.resize(size);
     m_size += back.size();
 }
@@ -44,26 +43,15 @@ uint8_t* llog::DQueue::pop_data(size_t size) {
     while (remaining > 0 && !m_vectors.empty()) {
         auto& front = m_vectors.front();
         size_t available = front.size() - m_first_vector_offset;
+
         if (available <= remaining) {
-
-            if (available == remaining && m_first_vector_offset == 0) { // special case when all chunk can be dumped
-                vector_type r = std::move(front);
-                m_vectors.pop_front();
-                m_size -= available;
-                auto ptr = r.data();
-                m_vector_pool.push_back(std::move(r));
-                return ptr;
-            }
-
             v.insert(v.end(), front.begin() + m_first_vector_offset, front.end());
             remaining -= available;
             m_first_vector_offset = 0;
             vector_type r = std::move(front);
             m_vector_pool.push_back(std::move(r));
             m_vectors.pop_front();
-
             m_size -= available;
-
         } else {
             v.insert(v.end(), front.begin() + m_first_vector_offset, front.begin() + m_first_vector_offset + remaining);
             m_first_vector_offset += remaining;
@@ -84,4 +72,8 @@ void llog::DQueue::reset() {
     m_vectors.clear();
     m_size = 0;
     m_first_vector_offset = 0;
+}
+
+void llog::DQueue::set_logger(LogPtr logger) {
+    m_logger = std::move(logger);
 }
