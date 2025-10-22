@@ -1,6 +1,7 @@
 #include "dqueue.hpp"
 
 #include <cstring>
+#include <iostream>
 
 std::pair<uint8_t *, size_t> llog::DQueue::allocate(size_t size) {
 
@@ -9,11 +10,9 @@ std::pair<uint8_t *, size_t> llog::DQueue::allocate(size_t size) {
     if (!m_vector_pool.empty()) {
         v = std::move(m_vector_pool.front());
         m_vector_pool.pop_front();
-        if (size > v.size())
-            v.resize(size);
-    } else {
-        v.resize(size);
     }
+
+    v.resize(size);
     auto ptr = v.data();
     size_t s = v.size();
     m_vectors.push_back(std::move(v));
@@ -33,6 +32,12 @@ uint8_t* llog::DQueue::pop_data(size_t size) {
     }
 
     vector_type v;
+
+    if (!m_vector_pool.empty()) {
+        v = std::move(m_vector_pool.front());
+        m_vector_pool.pop_front();
+        v.resize(0);
+    }
 
     size_t remaining = size;
 

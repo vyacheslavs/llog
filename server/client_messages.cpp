@@ -1,4 +1,7 @@
 #include "client_messages.hpp"
+
+#include <iostream>
+
 #include "msglog.hpp"
 
 llog::ClientConnectMessagePtr llog::ClientConnectMessage::create(const uint8_t *payload, size_t size, int fd) {
@@ -19,6 +22,7 @@ int llog::ClientConnectMessage::fd() const {
 }
 
 llog::MessagePtr llog::parse_client_connect_message(MessageType mt, const uint8_t *payload, size_t size, int fd, const std::string& id) {
+
     if (mt == MessageType::LOG_MSG_TYPE_CLIENT_CONNECT)
         return ClientConnectMessage::create(payload, size, fd);
     else if (mt == MessageType::LOG_MSG_GENERIC)
