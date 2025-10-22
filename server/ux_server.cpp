@@ -50,6 +50,7 @@ llog::UxConnectionPtr llog::UxServer::accept() const {
 
     llog::UxConnectionPtr conn(new UxConnection);
     conn->m_fd = new_fd;
+    conn->m_log = m_logger;
 
     return std::move(conn);
 }

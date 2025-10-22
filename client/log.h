@@ -32,6 +32,14 @@ namespace llog::client {
                 __uint8_t id;
             } __attribute__((packed));
 
+            struct generic_msg_pkg {
+                __uint16_t type;
+                __uint16_t len;
+                __uint16_t severity;
+                __uint64_t timestamp;
+                __uint8_t message;
+            } __attribute__((packed));
+
             Log() = default;
 
             int m_fd {-1};

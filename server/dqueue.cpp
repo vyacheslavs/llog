@@ -2,11 +2,6 @@
 
 #include <cstring>
 
-void llog::DQueue::register_vector(vector_type &&v) {
-    m_size += v.size();
-    m_vectors.push_back(std::move(v));
-}
-
 std::pair<uint8_t *, size_t> llog::DQueue::allocate(size_t size) {
 
     vector_type v;
@@ -21,8 +16,15 @@ std::pair<uint8_t *, size_t> llog::DQueue::allocate(size_t size) {
     }
     auto ptr = v.data();
     size_t s = v.size();
-    register_vector(std::move(v));
+    m_vectors.push_back(std::move(v));
     return {ptr, s};
+}
+
+void llog::DQueue::commit(size_t size) {
+
+    auto back = m_vectors.back();
+    back.resize(size);
+    m_size += back.size();
 }
 
 uint8_t* llog::DQueue::pop_data(size_t size) {

@@ -38,7 +38,7 @@ int main(int argc, char **argv) {
     if (!rl)
         return 3;
 
-    auto logger = llog::MsgLog::create(rl);
+    auto logger = llog::MsgLog::create(rl, "llog-server");
     logger->log(llog::severity::INFO,"starting the llog daemon with session path: " + session_path);
     auto server = llog::UxServer::create(logger, session_path);
 
@@ -76,9 +76,7 @@ int main(int argc, char **argv) {
 
         for (auto& [client_fd, client] : *poller) {
             if (auto ux_connection = dynamic_cast<llog::UxConnection*>(client.descriptor.get())) {
-                logger->log(llog::severity::INFO, "client has events");
-
-                llog::process_chain(server_handler_chain, ux_connection->read());
+                ux_connection->read(server_handler_chain);
             }
         }
     }

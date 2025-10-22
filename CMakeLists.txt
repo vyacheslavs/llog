@@ -24,6 +24,8 @@ add_executable(llog
         server/msglog.hpp
         server/dqueue.cpp
         server/dqueue.hpp
+        server/client_messages.hpp
+        server/client_messages.cpp
 
         client/log.cpp
         client/log.h
