@@ -12,6 +12,7 @@ namespace llog {
     class GenericMessage : public Message {
         public:
             static GenericMessagePtr create(severity sev, const std::string& id, const std::string& msg);
+            static GenericMessagePtr create(const std::string& id, const uint8_t* payload, size_t size);
 
             [[nodiscard]] MessageType type() const override;
             [[nodiscard]] std::string formatted() const;

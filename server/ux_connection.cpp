@@ -6,7 +6,6 @@
 
 namespace {
     constexpr auto CON_BUF_SIZE = 1024;
-    constexpr auto MAX_MSG_LEN = 1024*1024;
 }
 
 int llog::UxConnection::fd() const {
@@ -44,6 +43,9 @@ void llog::UxConnection::read(HandlerChainLinkPtr h) {
                 if (static_cast<MessageType>(*_ptr) == MessageType::LOG_MSG_TYPE_CLIENT_CONNECT) {
                     m_msg_type = MessageType::LOG_MSG_TYPE_CLIENT_CONNECT;
                     m_proto_state = proto_state::READ_MSG_TYPE_DONE;
+                } else if (static_cast<MessageType>(*_ptr) == MessageType::LOG_MSG_GENERIC) {
+                    m_msg_type = MessageType::LOG_MSG_GENERIC;
+                    m_proto_state = proto_state::READ_MSG_TYPE_DONE;
                 } else {
                     // not acceptable, close the connection
                     m_log->log(severity::WARNING, "Connection closed due to invalid message type");
@@ -70,7 +72,7 @@ void llog::UxConnection::read(HandlerChainLinkPtr h) {
         if (m_proto_state == proto_state::READ_MSG_LEN_DONE) {
             auto data_size_needed = m_msg_len - message_type_hdr_len - message_len_hdr_len;
             if (m_connection_buf.available(data_size_needed)) {
-                process_chain(h, parse_client_connect_message(m_msg_type, m_connection_buf.pop_data(data_size_needed), data_size_needed, m_fd));
+                process_chain(h, parse_client_connect_message(m_msg_type, m_connection_buf.pop_data(data_size_needed), data_size_needed, m_fd, m_id));
                 m_proto_state = proto_state::INIT;
             } else
                 break;

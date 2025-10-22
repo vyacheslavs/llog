@@ -25,6 +25,6 @@ namespace llog {
             int m_fd {-1};
     };
 
-    MessagePtr parse_client_connect_message(MessageType mt, const uint8_t* payload, size_t size, int fd);
+    MessagePtr parse_client_connect_message(MessageType mt, const uint8_t* payload, size_t size, int fd, const std::string& id);
 
 }

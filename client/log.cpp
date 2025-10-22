@@ -1,5 +1,6 @@
 #include "log.h"
 
+#include <chrono>
 #include <unistd.h>
 #include <sys/socket.h>
 #include <sys/un.h>
@@ -8,8 +9,11 @@
 namespace {
     constexpr auto header_message_type_len = 2;
     constexpr auto header_message_len_len = 2;
+    constexpr auto header_severity_len = 2;
+    constexpr auto header_timestamp_len = 8;
 
     constexpr auto LOG_MSG_TYPE_CLIENT_CONNECT = 1;
+    constexpr auto LOG_MSG_TYPE_GENERIC_MSG = 6;
 }
 
 bool llog::client::Log::log(llog::severity s, const std::string &message) {
@@ -26,6 +30,18 @@ bool llog::client::Log::log(llog::severity s, const std::string &message) {
             return false;
         }
     }
+
+    const auto message_len = message.size() + header_message_type_len + header_message_len_len + header_severity_len + header_timestamp_len;
+    if (m_client_buffer.size() < message_len) m_client_buffer.resize(message_len);
+    auto *pkg = reinterpret_cast<generic_msg_pkg*>(m_client_buffer.data());
+
+    pkg->type = LOG_MSG_TYPE_GENERIC_MSG;
+    pkg->len = message_len;
+    pkg->severity = static_cast<uint16_t>(s);
+    pkg->timestamp = std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::system_clock::now().time_since_epoch()).count();
+    std::memcpy(&pkg->message, message.data(), message.size());
+    if (write(m_fd, m_client_buffer.data(), message_len) != message_len)
+        return false;
 
     return true;
 }

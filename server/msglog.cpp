@@ -15,6 +15,25 @@ llog::GenericMessagePtr llog::GenericMessage::create(severity sev, const std::st
     return std::move(r);
 }
 
+llog::GenericMessagePtr llog::GenericMessage::create(const std::string &id, const uint8_t *payload, size_t size) {
+    GenericMessagePtr r(new GenericMessage);
+
+    struct _generic_msg_pkg {
+        __uint16_t severity;
+        __uint64_t timestamp;
+        __uint8_t message;
+    } __attribute__((packed));
+
+    auto* _ptr = reinterpret_cast<const _generic_msg_pkg*>(payload);
+
+    r->m_id = id;
+    r->m_severity = static_cast<severity>(_ptr->severity);
+    r->m_time = std::chrono::system_clock::time_point(std::chrono::milliseconds(_ptr->timestamp));
+    r->m_msg = std::string(reinterpret_cast<const char*>(&_ptr->message), reinterpret_cast<const char*>(&_ptr->message) + size - sizeof(_ptr->severity) - sizeof(_ptr->timestamp));
+
+    return std::move(r);
+}
+
 llog::MessageType llog::GenericMessage::type() const {
     return MessageType::LOG_MSG_GENERIC;
 }
