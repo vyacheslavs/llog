@@ -19,13 +19,14 @@ namespace llog {
 
             virtual bool handle(MessagePtr msg) = 0;
 
-            void add_next(HandlerChainLinkPtr link);
+            HandlerChain::iterator add_next(HandlerChainLinkPtr link);
+            void remove_next(HandlerChain::iterator it);
             void add_message(MessagePtr msg);
 
         private:
 
-            std::vector<HandlerChainLinkPtr> m_next;
-            std::vector<MessagePtr> m_messages;
+            HandlerChain m_next;
+            MessageList m_messages;
     };
 
     void process_chain(HandlerChainLinkPtr& first, MessagePtr msg);

@@ -21,6 +21,7 @@ namespace llog {
             struct client_info {
                 DescriptorUsablePtr descriptor;
                 PollType pt;
+                HandlerChain::iterator h_it;
             };
 
             static PollerPtr create();

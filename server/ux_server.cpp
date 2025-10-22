@@ -54,6 +54,10 @@ llog::UxConnectionPtr llog::UxServer::accept() const {
     return std::move(conn);
 }
 
+bool llog::UxServer::handle(MessagePtr msg) {
+    return false;
+}
+
 void llog::UxServer::set_logger(LogPtr logger) {
     m_logger = std::move(logger);
 }

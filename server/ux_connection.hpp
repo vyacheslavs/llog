@@ -17,7 +17,9 @@ namespace llog {
             [[nodiscard]] bool alive() const;
             MessagePtr read();
 
-    private:
+            bool handle(MessagePtr msg) override;
+
+        private:
             UxConnection() = default;
             friend class UxServer;
 

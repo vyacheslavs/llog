@@ -9,11 +9,11 @@ llog::PollerPtr llog::Poller::create() {
 }
 
 void llog::Poller::add(DescriptorUsablePtr descriptor, PollType pt) {
-    m_clients[descriptor->fd()] = {descriptor, pt};
-
+    m_clients[descriptor->fd()] = {descriptor, pt, add_next(descriptor)};
 }
 
 void llog::Poller::remove(DescriptorUsablePtr descriptor) {
+    remove_next(m_clients[descriptor->fd()].h_it);
     m_clients.erase(descriptor->fd());
 }
 

@@ -12,8 +12,14 @@ void llog::HandlerChainLink::add_message(MessagePtr msg) {
     m_messages.push_back(msg);
 }
 
-void llog::HandlerChainLink::add_next(HandlerChainLinkPtr link) {
+llog::HandlerChain::iterator llog::HandlerChainLink::add_next(HandlerChainLinkPtr link) {
     m_next.push_back(link);
+    auto it = m_next.end();
+    return --it;
+}
+
+void llog::HandlerChainLink::remove_next(HandlerChain::iterator it) {
+    m_next.erase(it);
 }
 
 void llog::process_chain(HandlerChainLinkPtr &first, MessagePtr msg) {

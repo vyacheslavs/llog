@@ -19,3 +19,7 @@ bool llog::UxConnection::alive() const {
 llog::MessagePtr llog::UxConnection::read() {
     return {};
 }
+
+bool llog::UxConnection::handle(MessagePtr msg) {
+    return false;
+}

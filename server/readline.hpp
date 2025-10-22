@@ -5,7 +5,7 @@
 
 namespace llog {
     using ReadlinePtr = std::shared_ptr<class Readline>;
-    class Readline : public HandlerChainLink, public DescriptorUsable {
+    class Readline : public DescriptorUsable {
         public:
             static ReadlinePtr create(HandlerChainLinkPtr handler_root);
             bool handle(MessagePtr msg) override;

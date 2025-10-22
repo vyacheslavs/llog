@@ -58,7 +58,6 @@ bool llog::Readline::handle(MessagePtr msg) {
             printf("%s\n", msg_cast->formatted().c_str());
             fflush(stdout);
 
-
             // Restore input line and prompt
             rl_restore_prompt();
             rl_replace_line(saved_line, 0);

@@ -17,7 +17,9 @@ namespace llog {
 
             static UxServerPtr create(LogPtr logger, const std::string& sock_path);
             [[nodiscard]] int fd() const override;
-            UxConnectionPtr accept() const;
+            [[nodiscard]] UxConnectionPtr accept() const;
+
+            bool handle(MessagePtr msg) override;
 
             void set_logger(LogPtr logger);
 
