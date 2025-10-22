@@ -5,6 +5,7 @@
 #include <sys/socket.h>
 #include <sys/un.h>
 #include <cstring>
+#include <mutex>
 
 namespace {
     constexpr auto header_message_type_len = 2;
@@ -13,10 +14,14 @@ namespace {
     constexpr auto header_timestamp_len = 8;
 
     constexpr auto LOG_MSG_TYPE_CLIENT_CONNECT = 1;
-    constexpr auto LOG_MSG_TYPE_GENERIC_MSG = 6;
+    constexpr auto LOG_MSG_TYPE_GENERIC_MSG = 8;
 }
 
 bool llog::client::Log::log(llog::severity s, const std::string &message) {
+
+    static std::mutex log_mutex;
+
+    std::lock_guard<std::mutex> lock(log_mutex);
 
     if (!m_client_introduced) {
         m_client_introduced = true;
