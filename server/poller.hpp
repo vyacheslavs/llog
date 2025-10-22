@@ -5,12 +5,13 @@
 #include <vector>
 #include <sys/select.h>
 #include "descriptor.hpp"
+#include "handler_chain.hpp"
 
 namespace llog {
 
     using PollerPtr = std::shared_ptr<class Poller>;
 
-    class Poller {
+    class Poller : public HandlerChainLink {
         public:
             enum class PollType : int {
                 READ = 1,
@@ -26,13 +27,15 @@ namespace llog {
             void add(DescriptorUsablePtr descriptor, PollType pt);
             void remove(DescriptorUsablePtr descriptor);
             bool poll(std::chrono::milliseconds timeout);
-            bool has_events(DescriptorUsablePtr desc) const;
+            [[nodiscard]] bool has_events(DescriptorUsablePtr desc) const;
 
             using iterator = std::map<int, client_info>::iterator;
 
             iterator begin();
             iterator end();
             iterator erase(iterator it);
+
+            bool handle(MessagePtr msg) override;
 
         private:
             Poller() = default;

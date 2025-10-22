@@ -49,6 +49,9 @@ int main(int argc, char **argv) {
     if (!poller)
         return 2;
 
+    // server_handler -> poller
+    server_handler_chain->add_next(poller);
+
     poller->add(server, llog::Poller::PollType::READ);
     poller->add(rl, llog::Poller::PollType::READ);
 

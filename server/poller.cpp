@@ -55,3 +55,8 @@ llog::Poller::iterator llog::Poller::erase(iterator it) {
     return m_clients.erase(it);
 }
 
+bool llog::Poller::handle(MessagePtr msg) {
+    return false;
+}
+
+
