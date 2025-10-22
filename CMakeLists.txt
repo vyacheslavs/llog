@@ -18,6 +18,10 @@ add_executable(llog
         server/handler_chain.hpp
         server/handler_chain.cpp
         server/lambda_handler.hpp
+        server/readline.hpp
+        server/readline.cpp
+        server/msglog.cpp
+        server/msglog.hpp
 
         client/log.cpp
         client/log.h
@@ -28,5 +32,6 @@ add_executable(rl
 )
 
 target_link_libraries(rl PRIVATE readline)
+target_link_libraries(llog PRIVATE readline)
 
 target_include_directories(llog PRIVATE ${PROJECT_SOURCE_DIR})

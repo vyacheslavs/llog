@@ -15,13 +15,17 @@ namespace llog {
             virtual ~HandlerChainLink() = default;
 
             virtual void push_next(HandlerChain& queue);
+            virtual void push_message(MessageList& msg);
+
             virtual bool handle(MessagePtr msg) = 0;
 
             void add_next(HandlerChainLinkPtr link);
+            void add_message(MessagePtr msg);
 
         private:
 
             std::vector<HandlerChainLinkPtr> m_next;
+            std::vector<MessagePtr> m_messages;
     };
 
     void process_chain(HandlerChainLinkPtr& first, MessagePtr msg);

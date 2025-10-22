@@ -8,6 +8,8 @@
 #include "client/log.h"
 #include "poller.hpp"
 #include "lambda_handler.hpp"
+#include "readline.hpp"
+#include "msglog.hpp"
 
 llog::HandlerChainLinkPtr create_handler_graph(bool* running_ptr) {
 
@@ -28,7 +30,12 @@ int main(int argc, char **argv) {
     if (argc > 1) {
         session_path = create_session_path(argv[1]);
     }
-    auto logger = std::make_shared<llog::Log>();
+
+    auto rl = llog::Readline::create();
+    if (!rl)
+        return 3;
+
+    auto logger = llog::MsgLog::create(rl);
     logger->log(llog::severity::INFO,"starting the llog daemon with session path: " + session_path);
     auto server = llog::UxServer::create(logger, session_path);
 
@@ -46,6 +53,7 @@ int main(int argc, char **argv) {
         return 2;
 
     poller->add(server, llog::Poller::PollType::READ);
+    poller->add(rl, llog::Poller::PollType::READ);
 
     while (true) {
         if (!poller->poll(std::chrono::milliseconds(1000)))
@@ -56,8 +64,14 @@ int main(int argc, char **argv) {
 
             if (auto new_conn = server->accept()) {
                 poller->add(new_conn, llog::Poller::PollType::READ);
-            } else
+            } else {
+                logger->log(llog::severity::ERROR, "failed to accept connection");
                 break;
+            }
+        }
+
+        if (poller->has_events(rl)) {
+            rl->read();
         }
 
         for (auto& [client_fd, client] : *poller) {

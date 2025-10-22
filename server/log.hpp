@@ -5,11 +5,12 @@
 namespace llog {
 
     enum class severity : int {
-        ERROR = 0,
-        INFO = 1,
-        VERBOSE = 2,
-        DEBUG = 3,
-        TRACE = 4,
+        ERROR   = 0,
+        WARNING = 1,
+        INFO    = 2,
+        VERBOSE = 3,
+        DEBUG   = 4,
+        TRACE   = 5,
     };
 
     class Log {
@@ -19,4 +20,5 @@ namespace llog {
     };
 
     using LogPtr = std::shared_ptr<class Log>;
+
 }
