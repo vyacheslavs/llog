@@ -4,6 +4,7 @@
 #include <readline/readline.h>
 #include <readline/history.h>
 #include <unistd.h>
+#include "server_messages.hpp"
 
 #include "log.hpp"
 #include "msglog.hpp"
@@ -11,10 +12,17 @@
 namespace {
 
     constexpr auto PROMPT = "llog> ";
+    llog::HandlerChainLinkPtr handler_root;
 
     void line_handler(char *line) {
         if (line) {
-            // printf("You entered: '%s'\n", line);
+            if (handler_root) {
+                std::string line_s(line);
+                if (line_s == "q" || line_s == "exit") {
+                    llog::process_chain(handler_root, llog::ServerShutdownMessage::create());
+                }
+            }
+
             if (strlen(line) > 0) {
                 add_history(line); // Add to history
             }
@@ -26,10 +34,11 @@ namespace {
 
 }
 
-llog::ReadlinePtr llog::Readline::create() {
+llog::ReadlinePtr llog::Readline::create(HandlerChainLinkPtr _handler_root) {
 
     rl_callback_handler_install(PROMPT, line_handler);
 
+    handler_root = std::move(_handler_root);
     ReadlinePtr rl(new Readline);
     return std::move(rl);
 }
@@ -57,7 +66,6 @@ bool llog::Readline::handle(MessagePtr msg) {
             rl_redisplay();
             free(saved_line);
         }
-        return true;
     }
     return false;
 }
@@ -68,5 +76,9 @@ int llog::Readline::fd() const {
 
 void llog::Readline::read() {
     rl_callback_read_char();
+}
+
+llog::Readline::~Readline() {
+    rl_callback_handler_remove();
 }
 

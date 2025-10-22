@@ -21,7 +21,7 @@ llog::HandlerChainLinkPtr create_handler_graph(bool* running_ptr) {
         return false;
     });
 
-    return {};
+    return chain_head;
 }
 
 int main(int argc, char **argv) {
@@ -31,7 +31,10 @@ int main(int argc, char **argv) {
         session_path = create_session_path(argv[1]);
     }
 
-    auto rl = llog::Readline::create();
+    bool running = true;
+    auto server_handler_chain = create_handler_graph(&running);
+
+    auto rl = llog::Readline::create(server_handler_chain);
     if (!rl)
         return 3;
 
@@ -42,12 +45,6 @@ int main(int argc, char **argv) {
     if (!server)
         return 1;
 
-    bool running = true;
-    auto server_handler_chain = create_handler_graph(&running);
-
-    // auto client_log = llog::client::Log::create(session_path, "internal_logger");
-    // server->set_logger(client_log);
-
     auto poller = llog::Poller::create();
     if (!poller)
         return 2;
@@ -55,7 +52,7 @@ int main(int argc, char **argv) {
     poller->add(server, llog::Poller::PollType::READ);
     poller->add(rl, llog::Poller::PollType::READ);
 
-    while (true) {
+    while (running) {
         if (!poller->poll(std::chrono::milliseconds(1000)))
             break;
 
