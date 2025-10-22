@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 3.10)
-project(vk_pixel_reader_layer VERSION 0.2 LANGUAGES C CXX)
+project(llog VERSION 0.2 LANGUAGES C CXX)
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_POSITION_INDEPENDENT_CODE ON)
 
@@ -17,6 +17,7 @@ add_executable(llog
         server/ux_connection.cpp
         server/handler_chain.hpp
         server/handler_chain.cpp
+        server/lambda_handler.hpp
 
         client/log.cpp
         client/log.h

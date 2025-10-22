@@ -43,3 +43,15 @@ bool llog::Poller::has_events(DescriptorUsablePtr desc) const {
     return FD_ISSET(desc->fd(), &m_read_fds) || FD_ISSET(desc->fd(), &m_write_fds);
 }
 
+llog::Poller::iterator llog::Poller::begin() {
+    return m_clients.begin();
+}
+
+llog::Poller::iterator llog::Poller::end() {
+    return m_clients.end();
+}
+
+llog::Poller::iterator llog::Poller::erase(iterator it) {
+    return m_clients.erase(it);
+}
+

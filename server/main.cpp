@@ -7,6 +7,20 @@
 #include "ux_server.hpp"
 #include "client/log.h"
 #include "poller.hpp"
+#include "lambda_handler.hpp"
+
+llog::HandlerChainLinkPtr create_handler_graph(bool* running_ptr) {
+
+    llog::HandlerChainLinkPtr chain_head = llog::LambdaHandlerLink::create([running_ptr](llog::MessagePtr msg) {
+        if (msg->type() == llog::MessageType::LOG_MSG_TYPE_SERVER_SHUTDOWN) {
+            *running_ptr = false;
+            return true;
+        }
+        return false;
+    });
+
+    return {};
+}
 
 int main(int argc, char **argv) {
 
@@ -21,6 +35,9 @@ int main(int argc, char **argv) {
     if (!server)
         return 1;
 
+    bool running = true;
+    auto server_handler_chain = create_handler_graph(&running);
+
     // auto client_log = llog::client::Log::create(session_path, "internal_logger");
     // server->set_logger(client_log);
 
@@ -29,8 +46,6 @@ int main(int argc, char **argv) {
         return 2;
 
     poller->add(server, llog::Poller::PollType::READ);
-
-    std::list<llog::UxConnectionPtr> clients;
 
     while (true) {
         if (!poller->poll(std::chrono::milliseconds(1000)))
@@ -41,22 +56,15 @@ int main(int argc, char **argv) {
 
             if (auto new_conn = server->accept()) {
                 poller->add(new_conn, llog::Poller::PollType::READ);
-                clients.push_back(std::move(new_conn));
             } else
                 break;
         }
 
-        for (auto client_it = clients.begin(); client_it != clients.end(); ++client_it) {
-            auto client = *client_it;
-            if (poller->has_events(client)) {
+        for (auto& [client_fd, client] : *poller) {
+            if (auto ux_connection = dynamic_cast<llog::UxConnection*>(client.descriptor.get())) {
                 logger->log(llog::severity::INFO, "client has events");
 
-                if (auto msg = client->read()) {
-
-                } else if (!client->alive()) {
-                    poller->remove(client);
-                    client_it = clients.erase(client_it);
-                }
+                llog::process_chain(server_handler_chain, ux_connection->read());
             }
         }
     }

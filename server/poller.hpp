@@ -12,11 +12,14 @@ namespace llog {
 
     class Poller {
         public:
-
             enum class PollType : int {
                 READ = 1,
                 WRITE = 2,
                 READ_WRITE = READ | WRITE,
+            };
+            struct client_info {
+                DescriptorUsablePtr descriptor;
+                PollType pt;
             };
 
             static PollerPtr create();
@@ -25,17 +28,18 @@ namespace llog {
             bool poll(std::chrono::milliseconds timeout);
             bool has_events(DescriptorUsablePtr desc) const;
 
+            using iterator = std::map<int, client_info>::iterator;
+
+            iterator begin();
+            iterator end();
+            iterator erase(iterator it);
+
         private:
             Poller() = default;
 
             fd_set m_read_fds;
             fd_set m_write_fds;
             int m_max_fd {-1};
-
-            struct client_info {
-                DescriptorUsablePtr descriptor;
-                PollType pt;
-            };
 
             std::map<int, client_info> m_clients;
 
