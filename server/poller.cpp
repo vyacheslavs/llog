@@ -1,6 +1,10 @@
 #include "poller.hpp"
 
+#include <iostream>
+#include <ostream>
 #include <stdexcept>
+
+#include "server_messages.hpp"
 
 llog::PollerPtr llog::Poller::create() {
     auto p = PollerPtr(new Poller);
@@ -13,8 +17,16 @@ void llog::Poller::add(DescriptorUsablePtr descriptor, PollType pt) {
 }
 
 void llog::Poller::remove(DescriptorUsablePtr descriptor) {
-    remove_next(m_clients[descriptor->fd()].h_it);
-    m_clients.erase(descriptor->fd());
+    remove_by_fd(descriptor->fd());
+}
+
+void llog::Poller::remove_by_fd(int fd) {
+    remove_next(m_clients[fd].h_it);
+    m_clients.erase(fd);
+}
+
+void llog::Poller::mark_dead(int fd) {
+    m_clients[fd].descriptor->mark_dead();
 }
 
 bool llog::Poller::poll(std::chrono::milliseconds timeout) {
@@ -26,16 +38,23 @@ bool llog::Poller::poll(std::chrono::milliseconds timeout) {
     FD_ZERO(&m_write_fds);
 
     m_max_fd = -1;
-    for (auto &client : m_clients) {
-        if (client.second.pt == PollType::READ) {
-            FD_SET(client.first, &m_read_fds);
-        } else if (client.second.pt == PollType::WRITE) {
-            FD_SET(client.first, &m_write_fds);
+    for (auto client_it = m_clients.begin(); client_it != m_clients.end(); ++client_it) {
+        if (!client_it->second.descriptor->alive()) {
+            remove_next(m_clients[client_it->first].h_it); // keep in sync with remove_by_fd
+            client_it = m_clients.erase(client_it);
+        } else {
+            auto& client = *client_it;
+            if (client.second.pt == PollType::READ) {
+                FD_SET(client.first, &m_read_fds);
+            } else if (client.second.pt == PollType::WRITE) {
+                FD_SET(client.first, &m_write_fds);
+            }
+            m_max_fd = std::max(m_max_fd, client.first);
         }
-        m_max_fd = std::max(m_max_fd, client.first);
     }
 
-    auto res = select(m_max_fd, &m_read_fds, &m_write_fds, nullptr, &tv);
+    auto res = select(m_max_fd + 1, &m_read_fds, &m_write_fds, nullptr, &tv);
+
     return res >= 0;
 }
 
@@ -56,6 +75,16 @@ llog::Poller::iterator llog::Poller::erase(iterator it) {
 }
 
 bool llog::Poller::handle(MessagePtr msg) {
+
+    if (msg->type() == MessageType::LOG_MSG_TYPE_SERVER_CONNECTION_DEAD) {
+        auto msg_cast = std::dynamic_pointer_cast<ServerConnectionDeadMessage>(msg);
+        if (msg_cast) {
+            // don't remove immediately, just mark is as dead
+            mark_dead(msg_cast->fd());
+            return true;
+        }
+    }
+
     return false;
 }
 

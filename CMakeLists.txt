@@ -22,6 +22,8 @@ add_executable(llog
         server/readline.cpp
         server/msglog.cpp
         server/msglog.hpp
+        server/dqueue.cpp
+        server/dqueue.hpp
 
         client/log.cpp
         client/log.h

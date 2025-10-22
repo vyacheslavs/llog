@@ -24,6 +24,9 @@ void llog::HandlerChainLink::remove_next(HandlerChain::iterator it) {
 
 void llog::process_chain(HandlerChainLinkPtr &first, MessagePtr msg) {
 
+    if (!msg)
+        return;
+
     MessageList messages;
     messages.push_back(msg);
 

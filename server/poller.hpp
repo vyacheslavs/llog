@@ -27,6 +27,8 @@ namespace llog {
             static PollerPtr create();
             void add(DescriptorUsablePtr descriptor, PollType pt);
             void remove(DescriptorUsablePtr descriptor);
+            void remove_by_fd(int fd);
+            void mark_dead(int fd);
             bool poll(std::chrono::milliseconds timeout);
             [[nodiscard]] bool has_events(DescriptorUsablePtr desc) const;
 

@@ -3,6 +3,7 @@
 #include "descriptor.hpp"
 #include "message.hpp"
 #include <memory>
+#include "dqueue.hpp"
 
 namespace llog {
 
@@ -14,7 +15,6 @@ namespace llog {
             [[nodiscard]] int fd() const override;
             ~UxConnection() override;
 
-            [[nodiscard]] bool alive() const;
             MessagePtr read();
 
             bool handle(MessagePtr msg) override;
@@ -23,8 +23,9 @@ namespace llog {
             UxConnection() = default;
             friend class UxServer;
 
-            bool m_alive {true};
             int m_fd {-1};
+
+            DQueue m_connection_buf;
     };
 
 }

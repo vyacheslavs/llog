@@ -60,7 +60,7 @@ int main(int argc, char **argv) {
             break;
 
         if (poller->has_events(server)) {
-            logger->log(llog::severity::INFO, "server has a new connection");
+            logger->log(llog::severity::DEBUG, "server has a new connection");
 
             if (auto new_conn = server->accept()) {
                 poller->add(new_conn, llog::Poller::PollType::READ);
