@@ -8,7 +8,7 @@
 
 #include "log.hpp"
 #include "msglog.hpp"
-#include "readline_completion_commands_gen.hpp"
+#include "completion/readline_completion_commands_gen.hpp"
 #include "cmd_parser.hpp"
 #include "cmd_parser_severity.hpp"
 

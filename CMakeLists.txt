@@ -26,10 +26,10 @@ add_executable(llog
         server/dqueue.hpp
         server/client_messages.hpp
         server/client_messages.cpp
-        server/readline_completion_commands_gen.hpp
-        server/readline_completion_commands_gen.cpp
-        server/readline_severity_completion.hpp
-        server/readline_severity_completion.cpp
+        server/completion/readline_completion_commands_gen.hpp
+        server/completion/readline_completion_commands_gen.cpp
+        server/completion/readline_severity_completion.hpp
+        server/completion/readline_severity_completion.cpp
         server/cmd_parser.cpp
         server/cmd_parser.hpp
         server/cmd_parser_severity.hpp
@@ -47,3 +47,5 @@ target_link_libraries(rl PRIVATE readline)
 target_link_libraries(llog PRIVATE readline)
 
 target_include_directories(llog PRIVATE ${PROJECT_SOURCE_DIR})
+target_include_directories(llog PRIVATE ${PROJECT_SOURCE_DIR}/server)
+

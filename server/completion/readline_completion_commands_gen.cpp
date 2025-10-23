@@ -9,7 +9,7 @@
 #include "utils.h"
 
 namespace {
-    static const char *commands[] = {
+    const char *commands[] = {
         "severity",
         "quit",
         "exit",
