@@ -44,6 +44,17 @@ uint8_t* llog::DQueue::pop_data(size_t size) {
         auto& front = m_vectors.front();
         size_t available = front.size() - m_first_vector_offset;
 
+        if (available == remaining && v.empty()) {
+            vector_type r = std::move(front);
+            auto ptr = r.data() + m_first_vector_offset;
+            m_first_vector_offset = 0;
+            m_vector_pool.push_back(std::move(r));
+            m_vector_pool.push_back(std::move(v));
+            m_vectors.pop_front();
+            m_size -= available;
+            return ptr;
+        }
+
         if (available <= remaining) {
             v.insert(v.end(), front.begin() + m_first_vector_offset, front.end());
             remaining -= available;
@@ -53,6 +64,13 @@ uint8_t* llog::DQueue::pop_data(size_t size) {
             m_vectors.pop_front();
             m_size -= available;
         } else {
+            if (v.empty()) {
+                auto ptr = front.data() + m_first_vector_offset;
+                m_first_vector_offset += remaining;
+                m_size -= remaining;
+                m_vector_pool.push_back(std::move(v));
+                return ptr;
+            }
             v.insert(v.end(), front.begin() + m_first_vector_offset, front.begin() + m_first_vector_offset + remaining);
             m_first_vector_offset += remaining;
             m_size -= remaining;

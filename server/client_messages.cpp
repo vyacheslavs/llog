@@ -25,7 +25,7 @@ llog::MessagePtr llog::parse_client_connect_message(MessageType mt, const uint8_
 
     if (mt == MessageType::LOG_MSG_TYPE_CLIENT_CONNECT)
         return ClientConnectMessage::create(payload, size, fd);
-    else if (mt == MessageType::LOG_MSG_GENERIC)
+    if (mt == MessageType::LOG_MSG_GENERIC)
         return GenericMessage::create(id, payload, size);
     return {};
 }
