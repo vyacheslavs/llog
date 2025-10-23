@@ -11,6 +11,7 @@
 #include "completion/readline_completion_commands_gen.hpp"
 #include "parser/cmd_parser.hpp"
 #include "parser/cmd_parser_severity.hpp"
+#include "parser/cmd_parser_dedup.hpp"
 
 namespace {
 
@@ -56,11 +57,29 @@ llog::ReadlinePtr llog::Readline::create(HandlerChainLinkPtr _handler_root) {
 }
 
 bool llog::Readline::handle(MessagePtr msg) {
+
+    static int last_line_repeated = 0;
+    static std::string last_line;
+    static bool prev_same_line = false;
+
     if (msg->type() == MessageType::LOG_MSG_GENERIC) {
         auto msg_cast = std::dynamic_pointer_cast<GenericMessage>(msg);
         if (msg_cast) {
 
             if (!m_severity_settings[static_cast<int>(msg_cast->sev())])
+                return false;
+
+            const auto& line = msg_cast->msg();
+            bool same_line = last_line == line;
+            last_line = line;
+
+            if (same_line)
+                last_line_repeated++;
+
+            if (same_line && m_dedup == DedupOnOff::DedupType::ON)
+                return false;
+
+            if (same_line && m_dedup == DedupOnOff::DedupType::INFO && last_line_repeated > 4)
                 return false;
 
             char *saved_line = rl_copy_text(0, rl_end);
@@ -70,9 +89,34 @@ bool llog::Readline::handle(MessagePtr msg) {
             rl_replace_line("", 0);
             rl_redisplay();
 
-            // Print your message
-            printf("%s\n", msg_cast->formatted().c_str());
-            fflush(stdout);
+            if (m_dedup == DedupOnOff::DedupType::OFF) {
+                // Print your message
+                printf("%s\n", msg_cast->formatted().c_str());
+                fflush(stdout);
+            } else {
+                if (same_line) {
+                    // line repeated
+                    if (m_dedup == DedupOnOff::DedupType::INFO) {
+                        // print how much it has been repeated
+                        if (last_line_repeated == 1)
+                            printf("\n");
+
+                        if (last_line_repeated <= 3)
+                            printf(last_line_repeated == 1 ? "\033[A (repeated %d more time)\n" : "\033[A (repeated %d times)      \n", last_line_repeated);
+                        else
+                            printf("\033[A (repeating ...)              \n");
+                        fflush(stdout);
+                    }
+                } else {
+                    if (prev_same_line != same_line) {
+                        printf(last_line_repeated == 1 ? "\033[A (repeated %d more time)\n" : "\033[A (repeated %d times)      \n", last_line_repeated);
+                    }
+                    last_line_repeated = 0;
+                    printf("%s\n", msg_cast->formatted().c_str());
+                    fflush(stdout);
+                }
+                prev_same_line = same_line;
+            }
 
             // Restore input line and prompt
             rl_restore_prompt();
@@ -88,6 +132,13 @@ bool llog::Readline::handle(MessagePtr msg) {
         if (msg_cast) {
             auto [sev, onoff] = msg_cast->sev_change();
             m_severity_settings[static_cast<int>(sev)] = onoff;
+        }
+    }
+
+    if (msg->type() == MessageType::LOG_MSG_TYPE_SERVER_DEDUP_CHANGE) {
+        auto msg_cast = std::dynamic_pointer_cast<DedupOnOff>(msg);
+        if (msg_cast) {
+            m_dedup = msg_cast->onoff();
         }
     }
     return false;

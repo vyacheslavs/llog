@@ -4,6 +4,7 @@ namespace {
     const char* dedup_values[] = {
         "on",
         "off",
+        "info",
         nullptr
     };
 

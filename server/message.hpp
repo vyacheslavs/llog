@@ -14,6 +14,7 @@ namespace llog {
         LOG_MSG_READLINE_OUTPUT             = 7,
         LOG_MSG_GENERIC                     = 8,
         LOG_MSG_TYPE_SERVER_SEVERITY_CHANGE = 9,
+        LOG_MSG_TYPE_SERVER_DEDUP_CHANGE    = 10
     };
 
     class Message {

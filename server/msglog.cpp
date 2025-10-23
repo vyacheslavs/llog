@@ -72,6 +72,10 @@ std::string llog::GenericMessage::formatted() const {
     return ss.str();
 }
 
+const std::string & llog::GenericMessage::msg() const {
+    return m_msg;
+}
+
 llog::severity llog::GenericMessage::sev() const {
     return m_severity;
 }

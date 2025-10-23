@@ -38,6 +38,8 @@ add_executable(llog
         server/parser/cmd_parser.hpp
         server/parser/cmd_parser_severity.hpp
         server/parser/cmd_parser_severity.cpp
+        server/parser/cmd_parser_dedup.hpp
+        server/parser/cmd_parser_dedup.cpp
 
         client/log.cpp
         client/log.h

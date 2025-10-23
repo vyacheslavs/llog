@@ -2,6 +2,7 @@
 
 #include "handler_chain.hpp"
 #include "descriptor.hpp"
+#include "parser/cmd_parser_dedup.hpp"
 
 namespace llog {
     using ReadlinePtr = std::shared_ptr<class Readline>;
@@ -17,5 +18,6 @@ namespace llog {
         private:
             Readline() = default;
             std::vector<bool> m_severity_settings;
+            DedupOnOff::DedupType m_dedup {DedupOnOff::DedupType::ON};
     };
 }
