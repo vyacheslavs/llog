@@ -34,10 +34,10 @@ add_executable(llog
         server/completion/readline_dedup_completion.hpp
         server/completion/readline_completion_handler.cpp
         server/completion/readline_completion_handler.hpp
-        server/cmd_parser.cpp
-        server/cmd_parser.hpp
-        server/cmd_parser_severity.hpp
-        server/cmd_parser_severity.cpp
+        server/parser/cmd_parser.cpp
+        server/parser/cmd_parser.hpp
+        server/parser/cmd_parser_severity.hpp
+        server/parser/cmd_parser_severity.cpp
 
         client/log.cpp
         client/log.h
