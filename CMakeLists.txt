@@ -30,6 +30,10 @@ add_executable(llog
         server/completion/readline_completion_commands_gen.cpp
         server/completion/readline_severity_completion.hpp
         server/completion/readline_severity_completion.cpp
+        server/completion/readline_dedup_completion.cpp
+        server/completion/readline_dedup_completion.hpp
+        server/completion/readline_completion_handler.cpp
+        server/completion/readline_completion_handler.hpp
         server/cmd_parser.cpp
         server/cmd_parser.hpp
         server/cmd_parser_severity.hpp

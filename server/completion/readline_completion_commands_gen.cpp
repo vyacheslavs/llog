@@ -1,16 +1,16 @@
 #include "readline_completion_commands_gen.hpp"
 #include "readline_severity_completion.hpp"
+#include "readline_dedup_completion.hpp"
 
 #include <memory>
 #include <vector>
 #include <readline/readline.h>
-#include <sstream>
-
 #include "utils.h"
 
 namespace {
     const char *commands[] = {
         "severity",
+        "dedup",
         "quit",
         "exit",
         nullptr
@@ -38,7 +38,8 @@ namespace {
 char ** llog::rl_completion(const char *text, int start, int end) {
 
     static std::unique_ptr<llog::completion_handler> handlers[] = {
-        std::make_unique<severity_completion>()
+        std::make_unique<severity_completion>(),
+        std::make_unique<dedup_completion>()
     };
 
     if (start == 0)

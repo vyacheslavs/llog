@@ -21,53 +21,19 @@ namespace {
         nullptr
     };
 
-    char* generator_generic(const char *text, int state, const char** values, int& list_index, int& len) {
-        const char *name;
-
-        if (!state) {
-            list_index = 0;
-            len = strlen(text);
-        }
-
-        while ((name = values[list_index++])) {
-            if (strncmp(name, text, len) == 0) {
-                return strdup(name);
-            }
-        }
-        return nullptr;
-    }
-
     char * severities_generator(const char *text, int state) {
         static int list_index, len;
-        return generator_generic(text, state, severities, list_index, len);
+        return llog::generator_generic(text, state, severities, list_index, len);
     }
 
     char* sev_values_generator(const char *text, int state) {
         static int list_index, len;
-        return generator_generic(text, state, sev_values, list_index, len);
+        return llog::generator_generic(text, state, sev_values, list_index, len);
     }
 
 }
 
 llog::completion_generator llog::severity_completion::can_complete(const std::vector<std::string> &cmd) {
-
-    auto any_of = [](const std::string& cmd, const char ** variants) {
-        for (auto* p = variants; *p; ++p) {
-            if (*p == cmd)
-                return true;
-        }
-        return false;
-    };
-
-    auto any_of_starts_with = [](const std::string& cmd, const char ** variants) {
-        for (auto* p = variants; *p; ++p) {
-            std::string sub = *p;
-            if (cmd.size() < sub.size() && sub.compare(0, cmd.size(), cmd) == 0) {
-                return true;
-            }
-        }
-        return false;
-    };
 
     if (cmd.size() == 1 && cmd[0] == "severity")
         return severities_generator;
