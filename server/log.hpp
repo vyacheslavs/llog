@@ -11,6 +11,7 @@ namespace llog {
         VERBOSE = 3,
         DEBUG   = 4,
         TRACE   = 5,
+        SEVERITY_MAX = 6,
     };
 
     class Log {

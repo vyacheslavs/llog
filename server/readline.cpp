@@ -10,6 +10,7 @@
 #include "msglog.hpp"
 #include "readline_completion_commands_gen.hpp"
 #include "cmd_parser.hpp"
+#include "cmd_parser_severity.hpp"
 
 namespace {
 
@@ -49,6 +50,8 @@ llog::ReadlinePtr llog::Readline::create(HandlerChainLinkPtr _handler_root) {
 
     handler_root = std::move(_handler_root);
     ReadlinePtr rl(new Readline);
+
+    rl->m_severity_settings = std::vector<bool>(static_cast<int>(severity::SEVERITY_MAX), true);
     return std::move(rl);
 }
 
@@ -56,6 +59,10 @@ bool llog::Readline::handle(MessagePtr msg) {
     if (msg->type() == MessageType::LOG_MSG_GENERIC) {
         auto msg_cast = std::dynamic_pointer_cast<GenericMessage>(msg);
         if (msg_cast) {
+
+            if (!m_severity_settings[static_cast<int>(msg_cast->sev())])
+                return false;
+
             char *saved_line = rl_copy_text(0, rl_end);
             int saved_point = rl_point;
 
@@ -73,6 +80,14 @@ bool llog::Readline::handle(MessagePtr msg) {
             rl_point = saved_point;
             rl_redisplay();
             free(saved_line);
+        }
+    }
+
+    if (msg->type() == MessageType::LOG_MSG_TYPE_SERVER_SEVERITY_CHANGE) {
+        auto msg_cast = std::dynamic_pointer_cast<SeverityOnOff>(msg);
+        if (msg_cast) {
+            auto [sev, onoff] = msg_cast->sev_change();
+            m_severity_settings[static_cast<int>(sev)] = onoff;
         }
     }
     return false;

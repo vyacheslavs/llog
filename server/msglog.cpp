@@ -72,6 +72,10 @@ std::string llog::GenericMessage::formatted() const {
     return ss.str();
 }
 
+llog::severity llog::GenericMessage::sev() const {
+    return m_severity;
+}
+
 llog::MsgLogPtr llog::MsgLog::create(HandlerChainLinkPtr h, const std::string& id) {
     MsgLogPtr r(new MsgLog);
     r->m_handler = std::move(h);

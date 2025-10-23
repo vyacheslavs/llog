@@ -16,5 +16,6 @@ namespace llog {
 
         private:
             Readline() = default;
+            std::vector<bool> m_severity_settings;
     };
 }

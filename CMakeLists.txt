@@ -32,6 +32,8 @@ add_executable(llog
         server/readline_severity_completion.cpp
         server/cmd_parser.cpp
         server/cmd_parser.hpp
+        server/cmd_parser_severity.hpp
+        server/cmd_parser_severity.cpp
 
         client/log.cpp
         client/log.h

@@ -6,6 +6,8 @@
 #include <readline/readline.h>
 #include <sstream>
 
+#include "utils.h"
+
 namespace {
     static const char *commands[] = {
         "severity",
@@ -31,17 +33,6 @@ namespace {
         return nullptr;
     }
 
-    std::vector<std::string> splitString(const std::string& inputString, char delimiter) {
-        std::vector<std::string> words;
-        std::stringstream ss(inputString); // Create a stringstream from the input string
-        std::string word;
-
-        // Extract words using getline with the specified delimiter
-        while (std::getline(ss, word, delimiter)) {
-            words.push_back(word);
-        }
-        return words;
-    }
 }
 
 char ** llog::rl_completion(const char *text, int start, int end) {
@@ -53,7 +44,7 @@ char ** llog::rl_completion(const char *text, int start, int end) {
     if (start == 0)
         return rl_completion_matches(text, command_generator);
 
-    auto cmd = splitString(rl_line_buffer, ' ');
+    auto cmd = llog::utils::splitString(rl_line_buffer, ' ');
 
     for (auto& handler : handlers) {
         if (auto comp_gen = handler->can_complete(cmd))

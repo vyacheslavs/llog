@@ -26,9 +26,9 @@ llog::HandlerChainLinkPtr create_handler_graph(bool* running_ptr) {
 
 int main(int argc, char **argv) {
 
-    auto session_path = create_session_path({});
+    auto session_path = llog::utils::create_session_path({});
     if (argc > 1) {
-        session_path = create_session_path(argv[1]);
+        session_path = llog::utils::create_session_path(argv[1]);
     }
 
     bool running = true;

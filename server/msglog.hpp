@@ -16,6 +16,7 @@ namespace llog {
 
             [[nodiscard]] MessageType type() const override;
             [[nodiscard]] std::string formatted() const;
+            [[nodiscard]] severity sev() const;
 
         private:
             GenericMessage() = default;
