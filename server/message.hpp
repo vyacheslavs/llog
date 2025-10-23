@@ -1,4 +1,5 @@
 #pragma once
+#include <memory>
 #include <list>
 
 namespace llog {

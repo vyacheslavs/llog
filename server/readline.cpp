@@ -9,6 +9,7 @@
 #include "log.hpp"
 #include "msglog.hpp"
 #include "readline_completion_commands_gen.hpp"
+#include "cmd_parser.hpp"
 
 namespace {
 
@@ -16,12 +17,13 @@ namespace {
     llog::HandlerChainLinkPtr handler_root;
 
     void line_handler(char *line) {
+        llog::MessagePtr cmd;
         if (line) {
             if (handler_root) {
                 std::string line_s(line);
                 line_s.erase(line_s.find_last_not_of(" \t") + 1);
-                if (line_s == "q" || line_s == "exit" || line_s == "quit") {
-                    llog::process_chain(handler_root, llog::ServerShutdownMessage::create());
+                if (!line_s.empty()) {
+                    cmd = llog::parse_cmd(line_s);
                 }
             }
 
@@ -32,6 +34,10 @@ namespace {
         }
         // Re-install handler for next line
         rl_callback_handler_install(PROMPT, line_handler);
+
+        if (cmd)
+            llog::process_chain(handler_root, cmd);
+
     }
 
 }
