@@ -8,6 +8,7 @@
 
 #include "log.hpp"
 #include "msglog.hpp"
+#include "readline_completion_commands_gen.hpp"
 
 namespace {
 
@@ -18,7 +19,8 @@ namespace {
         if (line) {
             if (handler_root) {
                 std::string line_s(line);
-                if (line_s == "q" || line_s == "exit") {
+                line_s.erase(line_s.find_last_not_of(" \t") + 1);
+                if (line_s == "q" || line_s == "exit" || line_s == "quit") {
                     llog::process_chain(handler_root, llog::ServerShutdownMessage::create());
                 }
             }
@@ -37,6 +39,7 @@ namespace {
 llog::ReadlinePtr llog::Readline::create(HandlerChainLinkPtr _handler_root) {
 
     rl_callback_handler_install(PROMPT, line_handler);
+    rl_attempted_completion_function = llog::rl_completion;
 
     handler_root = std::move(_handler_root);
     ReadlinePtr rl(new Readline);

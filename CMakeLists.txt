@@ -26,6 +26,10 @@ add_executable(llog
         server/dqueue.hpp
         server/client_messages.hpp
         server/client_messages.cpp
+        server/readline_completion_commands_gen.hpp
+        server/readline_completion_commands_gen.cpp
+        server/readline_severity_completion.hpp
+        server/readline_severity_completion.cpp
 
         client/log.cpp
         client/log.h
