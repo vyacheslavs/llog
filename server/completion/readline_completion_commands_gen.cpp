@@ -11,6 +11,7 @@ namespace {
     const char *commands[] = {
         "severity",
         "dedup",
+        "filterout",
         "quit",
         "exit",
         nullptr

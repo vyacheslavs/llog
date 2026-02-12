@@ -8,13 +8,14 @@ namespace llog {
     using MessageList = std::list<MessagePtr>;
 
     enum class MessageType : int {
-        LOG_MSG_TYPE_CLIENT_CONNECT         = 1,
-        LOG_MSG_TYPE_SERVER_SHUTDOWN        = 5,
-        LOG_MSG_TYPE_SERVER_CONNECTION_DEAD = 6,
-        LOG_MSG_READLINE_OUTPUT             = 7,
-        LOG_MSG_GENERIC                     = 8,
-        LOG_MSG_TYPE_SERVER_SEVERITY_CHANGE = 9,
-        LOG_MSG_TYPE_SERVER_DEDUP_CHANGE    = 10
+        LOG_MSG_TYPE_CLIENT_CONNECT          = 1,
+        LOG_MSG_TYPE_SERVER_SHUTDOWN         = 5,
+        LOG_MSG_TYPE_SERVER_CONNECTION_DEAD  = 6,
+        LOG_MSG_READLINE_OUTPUT              = 7,
+        LOG_MSG_GENERIC                      = 8,
+        LOG_MSG_TYPE_SERVER_SEVERITY_CHANGE  = 9,
+        LOG_MSG_TYPE_SERVER_DEDUP_CHANGE     = 10,
+        LOG_MSG_TYPE_SERVER_FILTEROUT_CHANGE = 11,
     };
 
     class Message {

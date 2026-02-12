@@ -12,6 +12,7 @@
 #include "parser/cmd_parser.hpp"
 #include "parser/cmd_parser_severity.hpp"
 #include "parser/cmd_parser_dedup.hpp"
+#include "parser/cmd_parser_filterout.hpp"
 
 namespace {
 
@@ -68,6 +69,12 @@ bool llog::Readline::handle(MessagePtr msg) {
 
             if (!m_severity_settings[static_cast<int>(msg_cast->sev())])
                 return false;
+
+            // check filtering
+            for (const auto& filter_out : m_filter_outs) {
+                if (msg_cast->msg().find(filter_out) != std::string::npos)
+                    return false;
+            }
 
             const auto& line = msg_cast->msg();
             bool same_line = last_line == line;
@@ -139,6 +146,21 @@ bool llog::Readline::handle(MessagePtr msg) {
         auto msg_cast = std::dynamic_pointer_cast<DedupOnOff>(msg);
         if (msg_cast) {
             m_dedup = msg_cast->onoff();
+        }
+    }
+
+    if (msg->type() == MessageType::LOG_MSG_TYPE_SERVER_FILTEROUT_CHANGE) {
+        auto msg_cast = std::dynamic_pointer_cast<CmdParserFilterOut>(msg);
+        if (msg_cast) {
+            if (!msg_cast->filter_text().empty()) {
+                auto _msg =GenericMessage::create(severity::INFO, "system", "now filtering out: " + msg_cast->filter_text());
+                process_chain(handler_root, _msg);
+                m_filter_outs.push_back(msg_cast->filter_text());
+            } else {
+                auto _msg =GenericMessage::create(severity::INFO, "system", "filters are cleared");
+                process_chain(handler_root, _msg);
+                m_filter_outs.clear();
+            }
         }
     }
     return false;

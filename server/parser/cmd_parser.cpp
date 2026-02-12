@@ -6,12 +6,14 @@
 #include "server_messages.hpp"
 #include "utils.h"
 #include "cmd_parser_dedup.hpp"
+#include "cmd_parser_filterout.hpp"
 
 llog::MessagePtr llog::parse_cmd(const std::string &cmd) {
 
     static std::unique_ptr<parser> parsers[] = {
         std::make_unique<SeverityParser>(),
-        std::make_unique<DedupOnOffParser>()
+        std::make_unique<DedupOnOffParser>(),
+        std::make_unique<CmdParserFilterOutParser>()
     };
 
     if (cmd == "q" || cmd == "exit" || cmd == "quit")

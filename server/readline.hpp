@@ -19,5 +19,6 @@ namespace llog {
             Readline() = default;
             std::vector<bool> m_severity_settings;
             DedupOnOff::DedupType m_dedup {DedupOnOff::DedupType::ON};
+            std::list<std::string> m_filter_outs;
     };
 }
